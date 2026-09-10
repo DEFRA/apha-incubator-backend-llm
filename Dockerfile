@@ -1,59 +1,27 @@
-# Set default values for build arguments
-ARG PARENT_VERSION=2.2.1-python3.14.3
-ARG PORT=8085
-ARG PORT_DEBUG=8086
+FROM python:3.11-slim
 
-FROM defradigital/python-development:${PARENT_VERSION} AS development
+WORKDIR /app
 
-ENV PATH="/home/nonroot/.venv/bin:${PATH}"
-ENV LOG_CONFIG="logging-dev.json"
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/nonroot
+# Copy requirements
+COPY requirements.txt .
 
-COPY --chown=nonroot:nonroot pyproject.toml .
-COPY --chown=nonroot:nonroot README.md .
-COPY --chown=nonroot:nonroot uv.lock .
-COPY --chown=nonroot:nonroot app/ ./app/
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=1000,gid=1000 \
-    uv sync --locked --link-mode=copy
+# Copy application code
+COPY src/ src/
 
-COPY --chown=nonroot:nonroot logging-dev.json .
+# Expose port
+EXPOSE 8000
 
-ARG PORT=8085
-ARG PORT_DEBUG=8086
-ENV PORT=${PORT}
-EXPOSE ${PORT} ${PORT_DEBUG}
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
 
-CMD [ "-m", "app.main" ]
-
-FROM defradigital/python:${PARENT_VERSION} AS production
-
-ENV PATH="/home/nonroot/.venv/bin:${PATH}"
-ENV LOG_CONFIG="logging.json"
-
-USER root
-
-RUN apt update && \
-    apt install -y curl
-
-USER nonroot
-
-WORKDIR /home/nonroot
-
-COPY --from=development /home/nonroot/pyproject.toml .
-COPY --chown=nonroot:nonroot README.md .
-COPY --from=development /home/nonroot/uv.lock .
-COPY --from=development /home/nonroot/app ./app
-
-COPY logging.json .
-
-RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=1000,gid=1000 \
-    --mount=from=development,source=/home/nonroot/.local/bin/uv,target=/home/nonroot/.local/bin/uv \
-    uv sync --locked --compile-bytecode --link-mode=copy --no-dev
-
-ARG PORT
-ENV PORT=${PORT}
-EXPOSE ${PORT}
-
-CMD [ "-m", "app.main" ]
+# Start the application
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

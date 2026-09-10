@@ -1,31 +1,59 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "apha-incubator-backend-llm"
-version = "0.1.0"
-description = "apha-incubator-backend-llm"
+name = "text-summarization-api"
+version = "1.0.0"
+description = "A backend API for summarizing text using AWS Bedrock"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["aws", "bedrock", "summarization", "api", "fastapi"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
 dependencies = [
-    "asgi-logger==0.1.0",
-    "aws-embedded-metrics==3.3.0",
-    "dnspython==2.7.0",
-    "ecs-logging==2.2.0",
-    "fastapi==0.129.0",
-    "httpx==0.28.1",
-    "pydantic-settings==2.9.1",
-    "pymongo[aws,encryption,snappy,zstd]==4.13.1",
-    "uvicorn==0.34.3",
+    "fastapi==0.104.1",
+    "uvicorn==0.24.0",
+    "pydantic==2.4.2",
+    "python-dotenv==1.0.0",
+    "boto3>=1.39.0",
+    "requests==2.31.0",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
-    "pre-commit==4.2.0",
-    "pytest==8.4.0",
-    "pytest-asyncio==1.0.0",
-    "pytest-cov==6.2.1",
-    "pytest-mock==3.15.1",
-    "ruff==0.11.13",
-    "taskipy==1.14.1",
+    "pytest==7.4.3",
+    "pytest-cov==4.1.0",
+    "black==23.12.0",
+    "flake8==6.1.0",
+    "mypy==1.7.1",
 ]
 
-[tool.taskipy.tasks]
-format = "uv run ruff format . && uv run ruff check . --fix"
+[project.urls]
+"Homepage" = "https://github.com/yourusername/text-summarization-api"
+"Documentation" = "https://github.com/yourusername/text-summarization-api#readme"
+"Repository" = "https://github.com/yourusername/text-summarization-api.git"
+"Bug Tracker" = "https://github.com/yourusername/text-summarization-api/issues"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
