@@ -1,3 +1,7 @@
+> [!WARNING]
+> **This repository has been archived.** It is no longer maintained and is read-only.
+> Please follow [DEFRA/apha-incubator-core](https://github.com/DEFRA/apha-incubator-core) for ongoing updates.
+
 # Text Summarisation API - CDP Backend
 
 A FastAPI-based backend service for summarising text using AWS Bedrock. Built for CDP (Customer Data Platform) integration.
